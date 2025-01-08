@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Manage Driving License Types</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="text-2xl font-bold mb-4">Driving License Types</h1>
+
+    <!-- Add Driving License Type Button -->
+    <a th:href="@{/driving-license-types/add}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mb-4 inline-block">Add License Type</a>
+
+    <!-- Driving License Types Table -->
+    <table class="w-full border-collapse border border-gray-300 mt-4">
+        <thead>
+        <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2">Type</th>
+            <th class="border border-gray-300 px-4 py-2">Description</th>
+            <th class="border border-gray-300 px-4 py-2">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="licenseType : ${licenseTypes}">
+            <td class="border border-gray-300 px-4 py-2" th:text="${licenseType.type}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${licenseType.description}"></td>
+            <td class="border border-gray-300 px-4 py-2">
+                <a th:href="@{/driving-license-types/edit/{id}(id=${licenseType.id})}" class="text-blue-500 hover:underline">Edit</a> |
+                <a th:href="@{/driving-license-types/delete/{id}(id=${licenseType.id})}" class="text-red-500 hover:underline" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

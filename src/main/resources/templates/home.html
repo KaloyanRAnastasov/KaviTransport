@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Home - Transport Management System</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="bg-white shadow-md rounded p-6">
+        <h2 class="text-3xl font-bold mb-4">Welcome to the Transport Management System</h2>
+        <p class="text-lg mb-4">Manage your transport operations with ease and efficiency.</p>
+        <a th:href="@{/register}" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded">Get Started</a>
+    </div>
+</div>
+</body>
+</html>

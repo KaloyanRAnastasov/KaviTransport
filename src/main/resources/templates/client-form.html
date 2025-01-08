@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Client Form</title>
+</head>
+<body>
+<div layout:fragment="content" class="container mx-auto p-6 bg-white shadow-md rounded">
+    <h1 class="text-2xl font-bold mb-4" th:text="${client.id != null ? 'Edit Client' : 'Add Client'}"></h1>
+    <form th:action="@{/clients/save}" th:object="${client}" method="post" class="space-y-4">
+        <input type="hidden" th:field="*{id}" />
+
+        <div>
+            <label for="name" class="block text-gray-700 font-medium">Name:</label>
+            <input type="text" id="name" th:field="*{name}"
+                   class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
+                   required />
+        </div>
+
+        <div>
+            <label for="contactInfo" class="block text-gray-700 font-medium">Contact Info:</label>
+            <input type="text" id="contactInfo" th:field="*{contactInfo}"
+                   class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2" />
+        </div>
+
+        <div>
+            <label for="balance" class="block text-gray-700 font-medium">Balance:</label>
+            <input type="number" id="balance" th:field="*{balance}" step="0.01"
+                   class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
+                   required />
+        </div>
+
+        <div>
+            <label for="totalPaid" class="block text-gray-700 font-medium">Total Paid:</label>
+            <input type="number" id="totalPaid" th:field="*{totalPaid}" step="0.01"
+                   class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
+                   required />
+        </div>
+
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded">Save</button>
+    </form>
+</div>
+</body>
+</html>

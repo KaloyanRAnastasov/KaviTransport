@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Clients</title>
+</head>
+<body>
+<div layout:fragment="content" class="container mx-auto p-6 bg-white shadow-md rounded">
+    <h1 class="text-2xl font-bold mb-4">Clients</h1>
+    <a th:href="@{/clients/add}" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded mb-4 inline-block">Add Client</a>
+
+    <table class="w-full border-collapse border border-gray-300 mt-4">
+        <thead>
+        <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2">Name</th>
+            <th class="border border-gray-300 px-4 py-2">Contact Info</th>
+            <th class="border border-gray-300 px-4 py-2">Balance</th>
+            <th class="border border-gray-300 px-4 py-2">Total Paid</th>
+            <th class="border border-gray-300 px-4 py-2">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="client : ${clients}" class="hover:bg-gray-100">
+            <td class="border border-gray-300 px-4 py-2" th:text="${client.name}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${client.contactInfo}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${client.getUnpaidSum()}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${client.totalPaid}"></td>
+            <td class="border border-gray-300 px-4 py-2">
+                <a th:href="@{/clients/edit/{id}(id=${client.id})}" class="text-blue-500 hover:underline">Edit</a> |
+                <a th:href="@{/clients/delete/{id}(id=${client.id})}" class="text-red-500 hover:underline" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

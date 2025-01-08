@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title layout:fragment="title">Default Title</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script>
+      // Wait for the DOM to fully load
+      document.addEventListener('DOMContentLoaded', function () {
+        // Success message
+        const successMessage = document.getElementById('successMessage');
+        if (successMessage) {
+          setTimeout(() => {
+            successMessage.classList.add('opacity-0');
+            setTimeout(() => successMessage.style.display = 'none', 500); // Wait for transition to complete
+          }, 2000);
+        }
+
+        // Error message
+        const errorMessage = document.getElementById('errorMessage');
+        if (errorMessage) {
+          setTimeout(() => {
+            errorMessage.classList.add('opacity-0');
+            setTimeout(() => errorMessage.style.display = 'none', 500); // Wait for transition to complete
+          }, 2000);
+        }
+      });
+    </script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+<header class="bg-blue-500 text-white p-4">
+    <div class="flex justify-between items-center w-full max-w-7xl mx-auto px-6">
+
+        <!-- Logo or Title -->
+        <div>
+            <a sec:authorize="isAuthenticated()" th:href="@{/dashboard}" class="hover:underline">
+                <h1 class="text-2xl font-bold">Transport Management System</h1>
+            </a>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/}" class="hover:underline">
+                <h1 class="text-2xl font-bold">Transport Management System</h1>
+            </a>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav sec:authorize="isAuthenticated()" class="lg:flex lg:space-x-20 pl-5 pr-3">
+            <ul class="flex flex-wrap lg:flex-nowrap lg:space-x-6">
+                <li class="mb-2 ml-5 lg:mb-0"><a th:href="@{/vehicle-types}" class="hover:underline">Vehicle Types</a></li>
+                <li class="mb-2 ml-5 lg:mb-0"><a th:href="@{/driving-license-types}" class="hover:underline">License Types</a></li>
+                <li class="mb-2 ml-5 lg:mb-0"><a th:href="@{/clients}" class="hover:underline">Clients</a></li>
+                <li class="mb-2 ml-5 lg:mb-0"><a th:href="@{/companies}" class="hover:underline">Companies</a></li>
+                <li class="mb-2 ml-5 lg:mb-0"><a th:href="@{/employees}" class="hover:underline">Employees</a></li>
+                <li class="mb-2 ml-5 lg:mb-0"><a th:href="@{/vehicles}" class="hover:underline">Vehicles</a></li>
+                <li class="mb-2 ml-5 lg:mb-0"><a th:href="@{/transports}" class="hover:underline">Transports</a></li>
+            </ul>
+        </nav>
+
+        <!-- Authentication Links -->
+        <div class="flex space-x-4">
+            <!-- Login/Register Section (Visible if not authenticated) -->
+            <div sec:authorize="!isAuthenticated()" class="flex space-x-4">
+                <a th:href="@{/login}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Login</a>
+                <a th:href="@{/register}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Register</a>
+            </div>
+
+            <!-- Welcome/Logout Section (Visible if authenticated) -->
+            <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
+                <span>Welcome, <span sec:authentication="name" class="font-semibold"></span></span>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Logout</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</header>
+
+<div id="successMessage" th:if="${successMessage}" class="bg-green-500 text-white p-4 rounded mb-4 transition-opacity duration-500 ease-in-out opacity-100">
+    <p th:text="${successMessage}"></p>
+</div>
+<div id="errorMessage" th:if="${errorMessage}" class="bg-red-500 text-white p-4 rounded mb-4 transition-opacity duration-500 ease-in-out opacity-100">
+    <p th:text="${errorMessage}"></p>
+</div>
+<main class="container mx-auto p-6 mt-4" layout:fragment="content">
+    <p>Default content (this will be replaced).</p>
+</main>
+
+<footer class="bg-gray-800 text-white text-center p-4 mt-10">
+    <p>&copy; 2025 Transport Company. All rights reserved.</p>
+</footer>
+</body>
+</html>

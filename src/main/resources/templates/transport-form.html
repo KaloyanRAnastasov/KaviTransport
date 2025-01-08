@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Transport Form</title>
+    <script>
+      function toggleFields() {
+        const vehicleTypeElement = document.getElementById('vehicle');
+        try {
+          const loadType = vehicleTypeElement.selectedOptions[0].getAttribute('data-load-type');
+          document.getElementById('peopleFields').style.display = (loadType == '0') ? 'block' : 'none';
+          document.getElementById('goodsFields').style.display = (loadType == '1') ? 'block' : 'none';
+          updateDrivers();
+        } catch (error) {
+          console.error('Error toggling fields:', error);
+        }
+      }
+
+      function updateDrivers() {
+        const vehicleId = document.getElementById('vehicle').value;
+        const driverSelect = document.getElementById('driver');
+
+        fetch(`/vehicles/${vehicleId}/eligible-drivers`)
+          .then(response => response.json())
+          .then(data => {
+            driverSelect.innerHTML = ''; // Clear existing options
+            data.forEach(driver => {
+              const option = document.createElement('option');
+              option.value = driver.id;
+              option.textContent = driver.name;
+              driverSelect.appendChild(option);
+            });
+          })
+          .catch(error => console.error('Error fetching drivers:', error));
+      }
+
+      function updateVehicles() {
+        const companyId = document.getElementById('company').value;
+        const vehicleSelect = document.getElementById('vehicle');
+
+        fetch(`/companies/${companyId}/vehicles`)
+          .then(response => response.json())
+          .then(data => {
+            vehicleSelect.innerHTML = ''; // Clear existing options
+            data.forEach(vehicle => {
+              const option = document.createElement('option');
+              option.value = vehicle.id;
+              option.textContent = vehicle.licensePlate;
+              option.setAttribute('data-load-type', vehicle.vehicleType.loadType);
+              vehicleSelect.appendChild(option);
+            });
+            toggleFields(); // Update driver options after updating vehicles
+          })
+          .catch(error => console.error('Error fetching vehicles:', error));
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        toggleFields();
+        updateVehicles();
+      });
+    </script>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="text-2xl font-bold mb-4" th:text="${transport.id != null ? 'Edit Transport' : 'Add Transport'}"></h1>
+
+
+
+    <form th:action="@{/transports/save}" th:object="${transport}" method="post" class="max-w-md bg-white p-6 rounded shadow">
+
+        <div th:if="${#fields.hasErrors('*')}" class="mb-4 p-4 border border-red-400 bg-red-100 rounded">
+            <div class="text-red-700 font-medium mb-2">Please correct the following errors:</div>
+            <ul class="list-disc list-inside">
+                <li th:each="err : ${#fields.errors('*')}" th:text="${err}" class="text-red-600"></li>
+            </ul>
+        </div>
+
+        <input type="hidden" th:field="*{id}"/>
+
+        <!-- Client -->
+        <div class="mb-4">
+            <label for="client" class="block text-gray-700">Client:</label>
+            <select id="client" name="client.id" th:field="*{client.id}" required
+                    class="mt-1 block w-full rounded border-gray-300 p-2">
+                <option th:each="client : ${clients}" th:value="${client.id}" th:text="${client.name}"></option>
+            </select>
+        </div>
+
+        <!-- Company -->
+        <div class="mb-4">
+            <label for="company" class="block text-gray-700">Company:</label>
+            <select id="company" name="company.id" th:field="*{company.id}" onchange="updateVehicles()" required
+                    class="mt-1 block w-full rounded border-gray-300 p-2">
+                <option th:each="company : ${companies}" th:value="${company.id}" th:text="${company.name}"></option>
+            </select>
+        </div>
+
+        <!-- Vehicle -->
+        <div class="mb-4">
+            <label for="vehicle" class="block text-gray-700">Vehicle:</label>
+            <select id="vehicle" name="vehicle.id" th:field="*{vehicle.id}" onchange="toggleFields()" required
+                    class="mt-1 block w-full rounded border-gray-300 p-2">
+                <!-- Populated dynamically by updateVehicles() -->
+            </select>
+        </div>
+
+        <!-- Driver -->
+        <div class="mb-4">
+            <label for="driver" class="block text-gray-700">Driver:</label>
+            <select id="driver" name="driver.id" th:field="*{driver.id}" required
+                    class="mt-1 block w-full rounded border-gray-300 p-2">
+                <!-- Populated dynamically by updateDrivers() -->
+            </select>
+        </div>
+
+        <!-- Start Point -->
+        <div class="mb-4">
+            <label for="startPoint" class="block text-gray-700">Start Point:</label>
+            <input type="text" id="startPoint" name="startPoint" th:value="*{startPoint}" required
+                   class="mt-1 block w-full rounded border-gray-300 p-2">
+        </div>
+
+        <!-- End Point -->
+        <div class="mb-4">
+            <label for="endPoint" class="block text-gray-700">End Point:</label>
+            <input type="text" id="endPoint" name="endPoint" th:value="*{endPoint}" required
+                   class="mt-1 block w-full rounded border-gray-300 p-2">
+        </div>
+
+        <!-- Departure Date -->
+        <div class="mb-4">
+            <label for="departureDate" class="block text-gray-700">Departure Date:</label>
+            <input type="datetime-local" id="departureDate" name="departureDate"
+                   th:value="*{(departureDate != null) ? (#temporals.format(departureDate, 'yyyy-MM-dd''T''HH:mm')) : ''}"
+                   required
+                   class="mt-1 block w-full rounded border-gray-300 p-2">
+        </div>
+
+        <!-- Arrival Date -->
+        <div class="mb-4">
+            <label for="arrivalDate" class="block text-gray-700">Arrival Date:</label>
+            <input type="datetime-local" id="arrivalDate" name="arrivalDate"
+                   th:value="*{(arrivalDate != null) ? (#temporals.format(arrivalDate, 'yyyy-MM-dd''T''HH:mm')) : ''}"
+                   required
+                   class="mt-1 block w-full rounded border-gray-300 p-2">
+        </div>
+
+        <!-- Fields for People -->
+        <div id="peopleFields" class="mb-4" style="display: none;">
+            <label for="peopleCount" class="block text-gray-700">Number of People:</label>
+            <input type="number" id="peopleCount" name="peopleCount" th:value="*{peopleCount}"
+                   class="mt-1 block w-full rounded border-gray-300 p-2">
+        </div>
+
+        <!-- Fields for Goods -->
+        <div id="goodsFields" style="display: none;">
+            <div class="mb-4">
+                <label for="totalWeight" class="block text-gray-700">Total Weight (kg):</label>
+                <input type="number" id="totalWeight" name="totalWeight" th:value="*{totalWeight}" step="0.01"
+                       class="mt-1 block w-full rounded border-gray-300 p-2">
+            </div>
+            <div class="mb-4">
+                <label for="volume" class="block text-gray-700">Volume (m³):</label>
+                <input type="number" id="volume" name="volume" th:value="*{volume}" step="0.01"
+                       class="mt-1 block w-full rounded border-gray-300 p-2">
+            </div>
+        </div>
+
+        <!-- Price -->
+        <div class="mb-4">
+            <label for="price" class="block text-gray-700">Price:</label>
+            <input type="number" id="price" name="price" th:value="*{price}" step="0.01" required
+                   class="mt-1 block w-full rounded border-gray-300 p-2">
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+    </form>
+</div>
+</body>
+</html>

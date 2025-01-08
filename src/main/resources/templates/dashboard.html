@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
+
+            <div class="bg-green-500 text-white p-6 rounded shadow">
+                <h2 class="text-2xl font-bold">Total Vehicles</h2>
+                <p class="text-lg mt-2" th:text="${totalVehicles}"></p>
+            </div>
+            <div class="bg-purple-500 text-white p-6 rounded shadow">
+                <h2 class="text-2xl font-bold">Total Transports</h2>
+                <p class="text-lg mt-2" th:text="${totalTransports}"></p>
+            </div>
+            <div class="bg-red-500 text-white p-6 rounded shadow">
+                <h2 class="text-2xl font-bold">Total Employees</h2>
+                <p class="text-lg mt-2" th:text="${totalEmployees}"></p>
+            </div>
+        </div>
+
+        <!-- Highlight Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Company with Max Revenue -->
+            <div class="bg-yellow-500 text-white p-6 rounded shadow">
+                <h2 class="text-2xl font-bold">Company with Max Revenue</h2>
+                <p class="text-lg mt-2" th:if="${companyWithMaxRevenue.isPresent()}"
+                   th:text="'Company: ' + ${companyWithMaxRevenue.get().name}"></p>
+                <p class="text-lg" th:if="${companyWithMaxRevenue.isPresent()}"
+                   th:text="'Revenue: $' + ${companyWithMaxRevenue.get().revenue}"></p>
+                <p class="text-lg mt-2" th:if="${!companyWithMaxRevenue.isPresent()}">No company found.</p>
+            </div>
+
+            <!-- Pending Payments -->
+            <div class="bg-teal-500 text-white p-6 rounded shadow">
+                <h2 class="text-2xl font-bold">Pending Payments</h2>
+                <p class="text-lg mt-2" th:text="${pendingPayments}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

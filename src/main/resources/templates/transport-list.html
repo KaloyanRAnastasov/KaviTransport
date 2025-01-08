@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Manage Transports</title>
+    <style>
+        .sortable:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="text-2xl font-bold mb-4">Transports</h1>
+
+    <!-- Filter Form -->
+    <form th:action="@{/transports}" method="get" class="mb-4 flex space-x-4">
+        <div>
+            <label for="clientFilter" class="block text-gray-700">Filter by Client:</label>
+            <select id="clientFilter" name="clientId" class="mt-1 block w-full rounded border-gray-300 p-2">
+                <option value="">All Clients</option>
+                <option th:each="client : ${clients}"
+                        th:value="${client.id}"
+                        th:text="${client.name}"
+                        th:selected="${param.clientId != null and param.clientId[0] == client.id.toString()}">
+                </option>
+            </select>
+        </div>
+        <div>
+            <label for="vehicleFilter" class="block text-gray-700">Filter by Vehicle:</label>
+            <select id="vehicleFilter" name="vehicleId" class="mt-1 block w-full rounded border-gray-300 p-2">
+                <option value="">All Vehicles</option>
+                <option th:each="vehicle : ${vehicles}"
+                        th:value="${vehicle.id}"
+                        th:text="${vehicle.licensePlate}"
+                        th:selected="${param.vehicleId != null and param.vehicleId[0] == vehicle.id.toString()}">
+                </option>
+            </select>
+        </div>
+        <div>
+            <label for="paidStatusFilter" class="block text-gray-700">Filter by Paid Status:</label>
+            <select id="paidStatusFilter" name="isPaid" class="mt-1 block w-full rounded border-gray-300 p-2">
+                <option value="">All</option>
+                <option value="true" th:selected="${param.isPaid != null and param.isPaid[0] == 'true'}">Paid</option>
+                <option value="false" th:selected="${param.isPaid != null and param.isPaid[0] == 'false'}">Not Paid
+                </option>
+            </select>
+        </div>
+        <div class="flex items-end">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Filter</button>
+        </div>
+    </form>
+
+    <!-- Add Transport Button -->
+    <a th:href="@{/transports/add}"
+       class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mb-4 inline-block">Add Transport</a>
+
+    <!-- Transport Table -->
+    <table class="w-full border-collapse border border-gray-300 mt-4">
+        <thead>
+        <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2">
+                <a th:href="@{/transports(sort='startPoint', sortOrder=${sort == 'startPoint' and sortOrder == 'asc' ? 'desc' : 'asc'},
+                clientId=${param.clientId},
+        vehicleId=${param.vehicleId},
+        isPaid=${param.isPaid})}"
+
+                   class="sortable">
+                    Start Point <span th:text="${sort == 'startPoint' ? (sortOrder == 'asc' ? '▲' : '▼') : ''}"></span>
+                </a>
+            </th>
+            <th class="border border-gray-300 px-4 py-2">
+                <a th:href="@{/transports(sort='endPoint',
+                    sortOrder=${sort == 'endPoint' and sortOrder == 'asc' ? 'desc' : 'asc'},
+                    clientId=${param.clientId},
+                    vehicleId=${param.vehicleId},
+                    isPaid=${param.isPaid})}"
+                    class="sortable">
+                    End Point <span th:text="${sort == 'endPoint' ? (sortOrder == 'asc' ? '▲' : '▼') : ''}"></span>
+                </a>
+            </th>
+            <th class="border border-gray-300 px-4 py-2">
+                <a th:href="@{/transports(sort='departureDate', sortOrder=${sort == 'departureDate' and sortOrder == 'asc' ? 'desc' : 'asc'},
+                    clientId=${param.clientId},
+                    vehicleId=${param.vehicleId},
+                    isPaid=${param.isPaid})}"
+                   class="sortable">
+                    Departure Date <span
+                        th:text="${sort == 'departureDate' ? (sortOrder == 'asc' ? '▲' : '▼') : ''}"></span>
+                </a>
+
+            </th>
+            <th class="border border-gray-300 px-4 py-2 sortable"
+                th:onclick="|window.location='?sort=arrivalDate,' + (param.sortOrder == 'asc' ? 'desc' : 'asc')|">
+                <a th:href="@{/transports(sort='arrivalDate', sortOrder=${sort == 'arrivalDate' and sortOrder == 'asc' ? 'desc' : 'asc'},
+                    clientId=${param.clientId},
+                    vehicleId=${param.vehicleId},
+                    isPaid=${param.isPaid})}"
+                   class="sortable">
+                    Arrival Date <span
+                        th:text="${sort == 'arrivalDate' ? (sortOrder == 'asc' ? '▲' : '▼') : ''}"></span>
+                </a>
+            </th>
+            <th class="border border-gray-300 px-4 py-2 sortable"
+                th:onclick="|window.location='?sort=vehicle.licensePlate,' + (param.sortOrder == 'asc' ? 'desc' : 'asc')|">
+                <a th:href="@{/transports(sort='vehicle.licensePlate', sortOrder=${sort == 'vehicle.licensePlate' and sortOrder == 'asc' ? 'desc' : 'asc'},
+                    clientId=${param.clientId},
+                    vehicleId=${param.vehicleId},
+                    isPaid=${param.isPaid})}"
+                   class="sortable">
+                    Vehicle <span
+                        th:text="${sort == 'vehicle.licensePlate' ? (sortOrder == 'asc' ? '▲' : '▼') : ''}"></span>
+                </a>
+            </th>
+            <th class="border border-gray-300 px-4 py-2 sortable"
+                th:onclick="|window.location='?sort=driver.name,' + (param.sortOrder == 'asc' ? 'desc' : 'asc')|">
+                <a th:href="@{/transports(sort='driver.name', sortOrder=${sort == 'driver.name' and sortOrder == 'asc' ? 'desc' : 'asc'},
+                    clientId=${param.clientId},
+                    vehicleId=${param.vehicleId},
+                    isPaid=${param.isPaid})}"
+                   class="sortable">
+                    Driver <span th:text="${sort == 'driver.name' ? (sortOrder == 'asc' ? '▲' : '▼') : ''}"></span>
+                </a>
+            </th>
+            <th class="border border-gray-300 px-4 py-2 sortable"
+                th:onclick="|window.location='?sort=client.name,' + (param.sortOrder == 'asc' ? 'desc' : 'asc')|">
+                <a th:href="@{/transports(sort='client.name', sortOrder=${sort == 'client.name' and sortOrder == 'asc' ? 'desc' : 'asc'},
+                    clientId=${param.clientId},
+                    vehicleId=${param.vehicleId},
+                    isPaid=${param.isPaid})}"
+                   class="sortable">
+                    Client <span th:text="${sort == 'client.name' ? (sortOrder == 'asc' ? '▲' : '▼') : ''}"></span>
+                </a>
+            </th>
+            <th class="border border-gray-300 px-4 py-2 sortable"
+                th:onclick="|window.location='?sort=price,' + (param.sortOrder == 'asc' ? 'desc' : 'asc')|">
+                <a th:href="@{/transports(sort='price', sortOrder=${sort == 'price' and sortOrder == 'asc' ? 'desc' : 'asc'},
+                    clientId=${param.clientId},
+                    vehicleId=${param.vehicleId},
+                    isPaid=${param.isPaid})}"
+                   class="sortable">
+                    Price <span th:text="${sort == 'price' ? (sortOrder == 'asc' ? '▲' : '▼') : ''}"></span>
+                </a>
+            </th>
+            <th class="border border-gray-300 px-4 py-2">Paid Status</th>
+            <th class="border border-gray-300 px-4 py-2">Actions
+                <div class="mb-4">
+                    <a th:href="@{/transports}"
+                       class="bg-gray-500 hover:bg-gray-600 text-gray-700 text-xs px-4 py-2 rounded text-white">Clear
+                        Sorting</a>
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="transport : ${transports}">
+            <td class="border border-gray-300 px-4 py-2" th:text="${transport.startPoint}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${transport.endPoint}"></td>
+            <td class="border border-gray-300 px-4 py-2"
+                th:text="${transport.departureDate != null ? #temporals.format(transport.departureDate, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+            <td class="border border-gray-300 px-4 py-2"
+                th:text="${transport.arrivalDate != null ? #temporals.format(transport.arrivalDate, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${transport.vehicle.licensePlate}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${transport.driver.name}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${transport.client.name}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${transport.price}"></td>
+            <td class="border border-gray-300 px-4 py-2">
+                <span th:text="${transport.isPaid} ? 'Paid' : 'Not Paid'"></span>
+            </td>
+            <td class="border border-gray-300 px-4 py-2">
+                <a th:if="${!transport.isPaid}" th:href="@{/transports/edit/{id}(id=${transport.id})}"
+                   class="text-blue-500 hover:underline">Edit</a>
+                <span th:if="${transport.isPaid}" class="text-gray-500">Edit</span>
+                <a th:if="${!transport.isPaid}" th:href="@{/transports/pay/{id}(id=${transport.id})}"
+                   class="text-green-500 hover:underline">Pay</a>
+
+                <a th:if="${!transport.isPaid}" th:href="@{/transports/delete/{id}(id=${transport.id})}"
+                   class="text-red-500 hover:underline" onclick="return confirm('Are you sure?')">Delete</a>
+                <span th:if="${transport.isPaid}" class="text-gray-500">Delete</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="mt-4 flex justify-between">
+        <a th:href="@{/transports(page=${pageable.previousOrFirst().pageNumber})}" th:if="${pageable.hasPrevious()}"
+           class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">Previous</a>
+        <a th:href="@{/transports(page=${pageable.next().pageNumber})}" th:if="${pageable.hasNext()}"
+           class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">Next</a>
+    </div>
+</div>
+</body>
+</html>

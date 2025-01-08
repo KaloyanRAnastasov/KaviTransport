@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Manage Vehicle Types</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="text-2xl font-bold mb-4">Vehicle Types</h1>
+
+    <!-- Add Vehicle Type Button -->
+    <a th:href="@{/vehicle-types/add}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mb-4 inline-block">Add Vehicle Type</a>
+
+    <!-- Vehicle Types Table -->
+    <table class="w-full border-collapse border border-gray-300 mt-4">
+        <thead>
+        <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2">Type Name</th>
+            <th class="border border-gray-300 px-4 py-2">Load Type</th>
+            <th class="border border-gray-300 px-4 py-2">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="vehicleType : ${vehicleTypes}">
+            <td class="border border-gray-300 px-4 py-2" th:text="${vehicleType.typeName}"></td>
+            <td class="border border-gray-300 px-4 py-2" th:text="${vehicleType.loadType == 0 ? 'People' : 'Goods'}"></td>
+            <td class="border border-gray-300 px-4 py-2">
+                <a th:href="@{/vehicle-types/edit/{id}(id=${vehicleType.id})}" class="text-blue-500 hover:underline">Edit</a> |
+                <a th:href="@{/vehicle-types/delete/{id}(id=${vehicleType.id})}" class="text-red-500 hover:underline" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
