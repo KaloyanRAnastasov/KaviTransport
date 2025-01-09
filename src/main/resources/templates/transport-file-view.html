@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Uploaded Transport Data</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="text-2xl font-bold mb-4">Uploaded Transport Data</h1>
+
+    <!-- Back Button -->
+    <div class="mb-4">
+        <a href="/transports" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+            Back to Reports
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300 mt-4">
+            <thead>
+            <tr class="bg-gray-200">
+                <th class="border border-gray-300 px-4 py-2">ID</th>
+                <th class="border border-gray-300 px-4 py-2">Start Point</th>
+                <th class="border border-gray-300 px-4 py-2">End Point</th>
+                <th class="border border-gray-300 px-4 py-2">Departure Date</th>
+                <th class="border border-gray-300 px-4 py-2">Arrival Date</th>
+                <th class="border border-gray-300 px-4 py-2">Price</th>
+                <th class="border border-gray-300 px-4 py-2">Client</th>
+                <th class="border border-gray-300 px-4 py-2">Driver</th>
+                <th class="border border-gray-300 px-4 py-2">Vehicle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="transport : ${transportData}">
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.id}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.startPoint}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.endPoint}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.departureDate}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.arrivalDate}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.price}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.client}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.driver}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.vehicle}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

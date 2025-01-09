@@ -5,6 +5,8 @@ import com.kavi.transport.entity.Payment;
 import com.kavi.transport.entity.Transport;
 import com.kavi.transport.entity.Vehicle;
 import com.kavi.transport.service.*;
+import com.kavi.transport.tdo.TransportData;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -16,12 +18,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/transports")
@@ -192,6 +200,56 @@ public class TransportController {
             redirectAttributes.addFlashAttribute("errorMessage", "An unexpected error occurred while deleting the transport.");
         }
         return "redirect:/transports";
+    }
+
+    @GetMapping("/export")
+    public void exportToCSV(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        String headerValue = "attachment; filename=transports.csv";
+        response.setHeader("Content-Disposition", headerValue);
+
+        List<Transport> transports = transportService.getAllTransports();
+
+        try (PrintWriter writer = response.getWriter()) {
+            writer.println("ID,Start Point,End Point,Departure Date,Arrival Date,Price,Client,Driver,Vehicle");
+
+            for (Transport transport : transports) {
+                writer.printf("%d,%s,%s,%s,%s,%.2f,%s,%s,%s%n",
+                        transport.getId(),
+                        transport.getStartPoint(),
+                        transport.getEndPoint(),
+                        transport.getDepartureDate(),
+                        transport.getArrivalDate(),
+                        transport.getPrice(),
+                        transport.getClient() != null ? transport.getClient().getName() : "N/A",
+                        transport.getDriver().getName(),
+                        transport.getVehicle().getLicensePlate());
+            }
+        }
+    }
+
+    @PostMapping("/upload")
+    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws IOException {
+        List<String> lines = new BufferedReader(new InputStreamReader(file.getInputStream())).lines().collect(Collectors.toList());
+
+        // Parse the CSV data (assuming the first row is the header)
+        List<TransportData> transportData = lines.stream().skip(1)
+                .map(line -> {
+                    String[] fields = line.split(",");
+                    return new TransportData(
+                            Long.parseLong(fields[0]),
+                            fields[1],
+                            fields[2],
+                            fields[3],
+                            fields[4],
+                            new BigDecimal(fields[5]),
+                            fields[6],
+                            fields[7],
+                            fields[8]);
+                }).collect(Collectors.toList());
+
+        model.addAttribute("transportData", transportData);
+        return "transport-file-view"; // A view to display the uploaded data
     }
 
 

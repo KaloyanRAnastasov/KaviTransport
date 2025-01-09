@@ -12,7 +12,6 @@
 
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
-
             <div class="bg-green-500 text-white p-6 rounded shadow">
                 <h2 class="text-2xl font-bold">Total Vehicles</h2>
                 <p class="text-lg mt-2" th:text="${totalVehicles}"></p>
@@ -28,8 +27,7 @@
         </div>
 
         <!-- Highlight Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Company with Max Revenue -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div class="bg-yellow-500 text-white p-6 rounded shadow">
                 <h2 class="text-2xl font-bold">Company with Max Revenue</h2>
                 <p class="text-lg mt-2" th:if="${companyWithMaxRevenue.isPresent()}"
@@ -38,12 +36,16 @@
                    th:text="'Revenue: $' + ${companyWithMaxRevenue.get().revenue}"></p>
                 <p class="text-lg mt-2" th:if="${!companyWithMaxRevenue.isPresent()}">No company found.</p>
             </div>
+        </div>
 
-            <!-- Pending Payments -->
-            <div class="bg-teal-500 text-white p-6 rounded shadow">
-                <h2 class="text-2xl font-bold">Pending Payments</h2>
-                <p class="text-lg mt-2" th:text="${pendingPayments}"></p>
-            </div>
+        <!-- Reports Section -->
+        <div class="bg-gray-200 p-6 rounded shadow">
+            <h2 class="text-2xl font-bold mb-4">Reports</h2>
+            <ul class="list-disc list-inside">
+                <li><a href="/transports/revenue" class="text-blue-500 hover:underline">Revenue Report</a></li>
+                <li><a href="/transports/driver-report" class="text-blue-500 hover:underline">Driver Transport Report</a></li>
+                <li><a href="/transports/report" class="text-blue-500 hover:underline">Transport Report</a></li>
+            </ul>
         </div>
     </div>
 </div>

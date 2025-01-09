@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Driver Transport Report</title>
+    <style>
+        .empty-message {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="text-2xl font-bold mb-4">Driver Transport Report</h1>
+
+    <!-- Filters Section -->
+    <div class="mb-6">
+        <form th:action="@{/transports/driver-report}" method="get" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- Start Date Filter -->
+            <div class="flex flex-col">
+                <label for="startDate" class="text-sm font-medium text-gray-700">Start Date:</label>
+                <input type="datetime-local" id="startDate" name="startDate" th:value="${startDate}"
+                       class="mt-1 block w-full rounded border-gray-300 p-2">
+            </div>
+
+            <!-- End Date Filter -->
+            <div class="flex flex-col">
+                <label for="endDate" class="text-sm font-medium text-gray-700">End Date:</label>
+                <input type="datetime-local" id="endDate" name="endDate" th:value="${endDate}"
+                       class="mt-1 block w-full rounded border-gray-300 p-2">
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-end gap-2">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Apply Filters</button>
+                <a th:href="@{/transports/driver-report}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Report Table Section -->
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300 mt-4">
+            <thead>
+            <tr class="bg-gray-200">
+                <th class="border border-gray-300 px-4 py-2">Driver</th>
+                <th class="border border-gray-300 px-4 py-2">Total Transports</th>
+                <th class="border border-gray-300 px-4 py-2">Total Income</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#maps.isEmpty(driverReport)}">
+                <td colspan="3" class="empty-message">No data found for the selected period</td>
+            </tr>
+            <tr th:each="entry : ${driverReport}">
+                <td class="border border-gray-300 px-4 py-2" th:text="${entry.key}"></td>
+                <td class="border border-gray-300 px-4 py-2 text-center" th:text="${entry.value.transportCount}"></td>
+                <td class="border border-gray-300 px-4 py-2 text-right" th:text="${#numbers.formatDecimal(entry.value.totalIncome, 1, 2)}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

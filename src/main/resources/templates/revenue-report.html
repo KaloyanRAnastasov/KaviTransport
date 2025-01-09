@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Revenue Report</title>
+    <style>
+        .chart-container {
+            margin: 1.5rem 0;
+            height: 400px;
+        }
+        .summary-card {
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .summary-stat {
+            text-align: center;
+            padding: 0.5rem;
+        }
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e40af;
+        }
+        .summary-label {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+      document.addEventListener('DOMContentLoaded', () => {
+        const revenueReport = /*[[${revenueReport}]]*/ {};
+        const months = [];
+        const revenues = [];
+        const transportCounts = [];
+        console.log("======================");
+
+        // Convert month numbers to names and prepare data
+        for (let i = 1; i <= 12; i++) {
+          const monthData = revenueReport[i];
+          const monthName = new Date(2000, i-1, 1).toLocaleString('default', { month: 'short' });
+          months.push(monthName);
+          revenues.push(monthData ? monthData.totalRevenue : 0);
+          transportCounts.push(monthData ? monthData.transportCount : 0);
+
+          console.log(monthData);
+        }
+
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: months,
+            datasets: [
+              {
+                label: 'Revenue',
+                data: revenues,
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: 'rgb(59, 130, 246)',
+                borderWidth: 1,
+                yAxisID: 'y'
+              },
+              {
+                label: 'Transports',
+                data: transportCounts,
+                backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                borderColor: 'rgb(245, 158, 11)',
+                borderWidth: 1,
+                type: 'line',
+                yAxisID: 'y1'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            },
+            scales: {
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: {
+                  display: true,
+                  text: 'Revenue'
+                }
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: {
+                  display: true,
+                  text: 'Number of Transports'
+                },
+                grid: {
+                  drawOnChartArea: false
+                }
+              }
+            }
+          }
+        });
+      });
+    </script>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container mx-auto px-4">
+        <!-- Header and Filters Row -->
+        <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+            <h1 class="text-2xl font-bold">Revenue Report</h1>
+
+            <!-- Filters -->
+            <form th:action="@{/transports/revenue}" method="get"
+                  class="w-full md:w-auto flex flex-wrap items-end gap-4">
+                <div>
+                    <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                    <select id="year" name="year"
+                            class="mt-1 block w-40 rounded border-gray-300 p-2">
+                        <option value="">Select Year</option>
+                        <option th:each="y : ${availableYears}"
+                                th:value="${y}"
+                                th:text="${y}"
+                                th:selected="${y == year}">
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="transportType" class="block text-sm font-medium text-gray-700">Transport Type</label>
+                    <select id="transportType" name="transportType"
+                            class="mt-1 block w-40 rounded border-gray-300 p-2">
+                        <option value="">All Types</option>
+                        <option value="cargo" th:selected="${transportType == 'cargo'}">Cargo</option>
+                        <option value="passenger" th:selected="${transportType == 'passenger'}">Passenger</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                        Apply
+                    </button>
+                    <a th:href="@{/transports/revenue}"
+                       class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Summary Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="summary-card">
+                <div class="summary-stat">
+                    <div class="summary-value" th:text="${#numbers.formatDecimal(summaryStats.totalYearRevenue, 1, 2)}">0.00</div>
+                    <div class="summary-label">Total Year Revenue</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-stat">
+                    <div class="summary-value" th:text="${summaryStats.totalTransports}">0</div>
+                    <div class="summary-label">Total Transports</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-stat">
+                    <div class="summary-value" th:text="${#numbers.formatDecimal(summaryStats.yearlyAverage, 1, 2)}">0.00</div>
+                    <div class="summary-label">Average Revenue per Transport</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart and Table Grid -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <!-- Chart Section -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-lg font-semibold mb-4">Revenue Trends</h2>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-lg font-semibold mb-4">Monthly Breakdown</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-4 py-2 text-left">Month</th>
+                            <th class="px-4 py-2 text-right">Revenue</th>
+                            <th class="px-4 py-2 text-right">Transports</th>
+                            <th class="px-4 py-2 text-right">Avg. Revenue</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="entry : ${revenueReport}"
+                            class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2" th:text="${T(java.time.Month).of(entry.key)}">January</td>
+                            <td class="px-4 py-2 text-right" th:text="${#numbers.formatDecimal(entry.value.totalRevenue, 1, 2)}">0.00</td>
+                            <td class="px-4 py-2 text-right" th:text="${entry.value.transportCount}">0</td>
+                            <td class="px-4 py-2 text-right" th:text="${#numbers.formatDecimal(entry.value.averageRevenue, 1, 2)}">0.00</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title layout:fragment="title">Transport Report</title>
+    <style>
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        .filter-group label {
+            font-weight: bold;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="text-2xl font-bold mb-4">Transport Report</h1>
+
+    <!-- Filters Section -->
+    <div class="filter-group">
+        <form th:action="@{/transports/report}" method="get" class="flex flex-wrap gap-4 mb-6">
+            <!-- Date Range Filter -->
+            <div>
+                <label for="startDate" class="block text-gray-700">Start Date:</label>
+                <input type="datetime-local" id="startDate" name="startDate" th:value="${startDate}"
+                       class="mt-1 block w-full rounded border-gray-300 p-2">
+            </div>
+            <div>
+                <label for="endDate" class="block text-gray-700">End Date:</label>
+                <input type="datetime-local" id="endDate" name="endDate" th:value="${endDate}"
+                       class="mt-1 block w-full rounded border-gray-300 p-2">
+            </div>
+
+            <!-- Client Filter -->
+            <div>
+                <label for="client" class="block text-gray-700">Client:</label>
+                <select id="client" name="clientId"
+                        class="mt-1 block w-full rounded border-gray-300 p-2">
+                    <option value="">All Clients</option>
+                    <option th:each="client : ${clients}"
+                            th:value="${client.id}"
+                            th:text="${client.name}"
+                            th:selected="${client.id == clientId}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Transport Type Filter -->
+            <div>
+                <label for="transportType" class="block text-gray-700">Transport Type:</label>
+                <select id="transportType" name="transportType"
+                        class="mt-1 block w-full rounded border-gray-300 p-2">
+                    <option value="">All Types</option>
+                    <option value="cargo" th:selected="${transportType == 'cargo'}">Cargo</option>
+                    <option value="passenger" th:selected="${transportType == 'passenger'}">Passenger</option>
+                </select>
+            </div>
+
+            <!-- Filter Button -->
+            <div class="self-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    Apply Filters
+                </button>
+                <a th:href="@{/transports/report}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded ml-2">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Report Table Section -->
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300 mt-4">
+            <thead>
+            <tr class="bg-gray-200">
+                <th class="border border-gray-300 px-4 py-2">Start Point</th>
+                <th class="border border-gray-300 px-4 py-2">End Point</th>
+                <th class="border border-gray-300 px-4 py-2">Departure Date</th>
+                <th class="border border-gray-300 px-4 py-2">Arrival Date</th>
+                <th class="border border-gray-300 px-4 py-2">Cargo/People</th>
+                <th class="border border-gray-300 px-4 py-2">Price</th>
+                <th class="border border-gray-300 px-4 py-2">Client</th>
+                <th class="border border-gray-300 px-4 py-2">Vehicle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${transports.empty}">
+                <td colspan="8" class="empty-message">No transports found matching the criteria</td>
+            </tr>
+            <tr th:each="transport : ${transports}">
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.startPoint}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.endPoint}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.departureDate != null ? #temporals.format(transport.departureDate, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.arrivalDate != null ? #temporals.format(transport.arrivalDate, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.cargoDescription != null ? transport.cargoDescription : (transport.peopleCount != null ? transport.peopleCount + ' People' : 'N/A')}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${#numbers.formatDecimal(transport.price, 1, 2)}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.client != null ? transport.client.name : 'N/A'}"></td>
+                <td class="border border-gray-300 px-4 py-2" th:text="${transport.vehicle != null ? transport.vehicle.licensePlate : 'N/A'}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

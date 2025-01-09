@@ -15,6 +15,8 @@
 <div layout:fragment="content">
     <h1 class="text-2xl font-bold mb-4">Transports</h1>
 
+
+
     <!-- Filter Form -->
     <form th:action="@{/transports}" method="get" class="mb-4 flex space-x-4">
         <div>
@@ -190,6 +192,42 @@
            class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">Previous</a>
         <a th:href="@{/transports(page=${pageable.next().pageNumber})}" th:if="${pageable.hasNext()}"
            class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">Next</a>
+    </div>
+
+
+
+    <div class="bg-gray-100 p-6 rounded shadow mt-6">
+        <h2 class="text-2xl font-bold mb-4">Data Management</h2>
+
+        <!-- Data Management Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Export Section -->
+            <div class="bg-white p-4 rounded shadow">
+                <h3 class="text-xl font-semibold mb-2">Export Transport Data</h3>
+                <p class="text-sm text-gray-600 mb-4">Download all transport data as a CSV file for offline use.</p>
+                <a href="/transports/export" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    Export Transport Data
+                </a>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="bg-white p-4 rounded shadow">
+                <h3 class="text-xl font-semibold mb-2">Upload Transport File</h3>
+                <p class="text-sm text-gray-600 mb-4">Upload a CSV file containing transport data to process and display.</p>
+                <form th:action="@{/transports/upload}" method="post" enctype="multipart/form-data" class="space-y-4">
+                    <div>
+                        <label for="file" class="block text-sm font-medium text-gray-700">Select CSV File:</label>
+                        <input type="file" id="file" name="file" accept=".csv" required
+                               class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                            Upload and Display Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 </body>
